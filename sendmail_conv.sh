@@ -7,7 +7,6 @@
 # 08/05/2012 - V1.3 - Change mp3 compression to CBR to solve some smartphone compatibility (thanks to Luca Mancino)
 # 01/08/2012 - V1.4 - Add PATH definition to avoid any problem (thanks to Christopher Wolff)
 # 01/11/2024 - V1.4 - Copy this script from https://gist.github.com/dougbtv/3d820a597347396a6e8d
-# 01/11/2024 - V1.5 - Convert to m4a instead of mp3
 
 # set PATH
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -58,27 +57,27 @@ else
   # convert wav file to mp3 file
   # -b 24 is using CBR, giving better compatibility on smartphones (you can use -b 32 to increase quality)
   # -V 2 is using VBR, a good compromise between quality and size for voice audio files
-  #lame -m m -b 24 stream.part3.wav stream.part3.mp3
-  # convert wav file to m4a file
-  ffmpeg -i stream.part3.wav -codec:a aac -ac 1 -b:a 48k -strict experimental stream.part3.m4a
+  lame -m m -V 6 stream.part3.wav stream.part3.mp3
+  # convert wav file to mp3 file
+  #  ffmpeg -i stream.part3.wav -codec:a aac -ac 1 -b:a 48k -strict experimental stream.part3.m4a
   # convert back mp3 to base64 file 
-  base64 stream.part3.m4a > stream.part3.m4a.base64 
+  base64 stream.part3.mp3 > stream.part3.mp3.base64 
  
-  # generate the new m4a attachment header 
+  # generate the new mp3 attachment header 
   # change Type: audio/x-wav to Type: audio/mpeg 
-  # change name="msg----.wav" to name="msg----.m4a" 
-  sed 's/x-wav/mp4/g' stream.part3.wav.head | sed 's/.wav/.m4a/g' > stream.part3.m4a.head
+  # change name="msg----.wav" to name="msg----.mp3" 
+  sed 's/x-wav/mpeg/g' stream.part3.wav.head | sed 's/.wav/.mp3/g' > stream.part3.mp3.head
  
   # generate first part of mail body, converting it to LF only 
   mv stream.part stream.new 
   cat stream.part1 >> stream.new 
   cat stream.part2 >> stream.new 
-  cat stream.part3.m4a.head >> stream.new 
+  cat stream.part3.mp3.head >> stream.new 
   dos2unix -o stream.new 
  
   # append base64 mp3 to mail body, keeping CRLF 
-  unix2dos -o stream.part3.m4a.base64 
-  cat stream.part3.m4a.base64 >> stream.new 
+  unix2dos -o stream.part3.mp3.base64 
+  cat stream.part3.mp3.base64 >> stream.new 
  
   # append end of mail body, converting it to LF only 
   echo "" >> stream.tmp 
